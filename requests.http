@@ -84,3 +84,96 @@ Accept: text/event-stream
     "timeZone": "America/New_York"
   }
 }
+
+
+### ===========================================================================
+### Work IQ A2A (Agent-to-Agent protocol, JSON-RPC 2.0) — Demo 3
+### Same delegated token as above. `A2A-Version: 1.0` selects the v1.0 method
+### names; omit it and the server falls back to v0.3 (message/send, tasks/get…).
+### Copy the returned task.id / task.contextId into the variables below.
+### ===========================================================================
+
+@a2a = https://workiq.svc.cloud.microsoft/a2a
+@a2aContextId = PASTE_CONTEXT_ID_HERE
+@a2aTaskId = PASTE_TASK_ID_HERE
+
+### A2A — discover the Agent Card
+GET {{a2a}}/.well-known/agent-card.json
+Authorization: Bearer {{token}}
+A2A-Version: 1.0
+
+### A2A — SendMessage (blocking; answer is in result.task.artifacts[].parts[].text)
+POST {{a2a}}/
+Authorization: Bearer {{token}}
+A2A-Version: 1.0
+Content-Type: application/json
+
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "SendMessage",
+  "params": {
+    "message": {
+      "role": "ROLE_USER",
+      "messageId": "{{$guid}}",
+      "parts": [{ "text": "What meetings do I have today?" }],
+      "metadata": { "Location": { "timeZone": "America/New_York", "timeZoneOffset": -240 } }
+    }
+  }
+}
+
+### A2A — SendMessage, multi-turn (reuse contextId from the previous result)
+POST {{a2a}}/
+Authorization: Bearer {{token}}
+A2A-Version: 1.0
+Content-Type: application/json
+
+{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "method": "SendMessage",
+  "params": {
+    "message": {
+      "role": "ROLE_USER",
+      "messageId": "{{$guid}}",
+      "contextId": "{{a2aContextId}}",
+      "parts": [{ "text": "Which of those is the longest?" }]
+    }
+  }
+}
+
+### A2A — SendStreamingMessage (SSE: task → statusUpdate → artifactUpdate… → statusUpdate COMPLETED)
+POST {{a2a}}/
+Authorization: Bearer {{token}}
+A2A-Version: 1.0
+Content-Type: application/json
+Accept: text/event-stream
+
+{
+  "jsonrpc": "2.0",
+  "id": 3,
+  "method": "SendStreamingMessage",
+  "params": {
+    "message": {
+      "role": "ROLE_USER",
+      "messageId": "{{$guid}}",
+      "parts": [{ "text": "Summarize my unread emails." }]
+    }
+  }
+}
+
+### A2A — GetTask
+POST {{a2a}}/
+Authorization: Bearer {{token}}
+A2A-Version: 1.0
+Content-Type: application/json
+
+{ "jsonrpc": "2.0", "id": 4, "method": "GetTask", "params": { "id": "{{a2aTaskId}}" } }
+
+### A2A — CancelTask (a completed task returns error -32002 TaskNotCancelableError)
+POST {{a2a}}/
+Authorization: Bearer {{token}}
+A2A-Version: 1.0
+Content-Type: application/json
+
+{ "jsonrpc": "2.0", "id": 5, "method": "CancelTask", "params": { "id": "{{a2aTaskId}}" } }

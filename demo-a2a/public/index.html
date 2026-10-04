@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Work IQ A2A</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  </head>
+  <body>
+    <div class="app">
+      <!-- Minimal top bar -->
+      <header class="topbar">
+        <div class="brand">
+          <span id="brand-name">Work IQ A2A</span>
+          <span class="brand-sub">Agent-to-Agent</span>
+        </div>
+        <div class="account">
+          <span id="account-name" class="muted"></span>
+          <span id="provider-badge" class="badge" hidden></span>
+          <button id="card-btn" class="ghost" hidden title="Show the Agent Card (A2A discovery)">Agent Card</button>
+          <button id="inspector-btn" class="ghost" hidden title="Toggle the A2A protocol inspector">Inspector</button>
+          <button id="new-btn" class="icon-btn" title="New chat" hidden aria-label="New chat">
+            <svg viewBox="0 0 24 24" width="18" height="18"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+          <button id="logout-btn" class="ghost" hidden>Sign out</button>
+        </div>
+      </header>
+
+      <!-- Sign-in panel -->
+      <section id="login-panel" class="center-panel" hidden>
+        <div class="card">
+          <h2>Sign in to start</h2>
+          <p class="muted">Use your Microsoft 365 account (delegated auth).</p>
+          <button id="login-btn" class="primary">Sign in</button>
+
+          <div id="device-code" class="device-code" hidden>
+            <p>Go to the following URL and enter the code:</p>
+            <a id="device-uri" href="#" target="_blank" rel="noopener"></a>
+            <div class="code-row">
+              <code id="device-user-code"></code>
+              <button id="copy-code" class="ghost">Copy</button>
+            </div>
+            <p class="muted small">You'll be taken to the chat screen automatically after signing in…</p>
+          </div>
+          <p id="login-error" class="error" hidden></p>
+        </div>
+      </section>
+
+      <!-- Chat panel -->
+      <section id="chat-panel" class="chat" hidden>
+        <div id="messages" class="messages" aria-live="polite"></div>
+
+        <div class="centerblock">
+          <h1 id="hero-title" class="hero-title">What's on your mind today?</h1>
+          <p class="hero-sub">Talks to Work IQ as a peer agent over the A2A protocol — discovers its Agent Card, then exchanges streaming tasks (SendStreamingMessage) with multi-turn context.</p>
+          <p id="agent-line" class="agent-line" hidden></p>
+
+          <form id="chat-form" class="composer">
+            <input
+              id="chat-input"
+              class="c-input"
+              type="text"
+              placeholder="Ask anything"
+              autocomplete="off"
+            />
+            <button type="submit" class="c-send" id="send-btn" title="Send" aria-label="Send">
+              <svg class="i-wave" viewBox="0 0 24 24" width="20" height="20"><path d="M4 12h1M8 8v8M12 5v14M16 8v8M20 12h0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              <svg class="i-arrow" viewBox="0 0 24 24" width="20" height="20"><path d="M12 19V5M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </form>
+
+          <div id="suggestions" class="suggestions">
+            <button class="suggestion">
+              <svg viewBox="0 0 24 24" width="20" height="20"><rect x="3" y="4" width="18" height="17" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3 9h18M8 2v4M16 2v4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+              <span>What meetings do I have today?</span>
+            </button>
+            <button class="suggestion">
+              <svg viewBox="0 0 24 24" width="20" height="20"><rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M4 7l8 6 8-6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span>Summarize my unread Outlook email</span>
+            </button>
+            <button class="suggestion">
+              <svg viewBox="0 0 24 24" width="20" height="20"><circle cx="9" cy="8" r="3.2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0M16 6a3 3 0 0 1 0 6M18 20a5 5 0 0 0-3-4.6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+              <span>What can you do as an A2A agent?</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- A2A protocol inspector -->
+      <aside id="inspector" class="inspector" hidden>
+        <div class="inspector-head">
+          <strong>A2A protocol inspector</strong>
+          <button id="task-btn" class="ghost" title="GetTask for the last task">GetTask</button>
+          <button id="clear-log" class="ghost">Clear</button>
+        </div>
+        <div id="ctx-line" class="ctx-line muted small">contextId: — · taskId: —</div>
+        <ol id="event-log" class="event-log"></ol>
+      </aside>
+    </div>
+
+    <!-- Agent Card dialog -->
+    <dialog id="card-dialog" class="card-dialog">
+      <div class="inspector-head">
+        <strong>Agent Card</strong>
+        <button id="card-close" class="ghost">Close</button>
+      </div>
+      <pre id="card-json" class="json"></pre>
+    </dialog>
+    <script src="app.js"></script>
+  </body>
+</html>

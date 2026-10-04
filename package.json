@@ -1,7 +1,7 @@
 {
   "name": "workiq-lab",
   "version": "1.0.0",
-  "description": "Test harness for the Microsoft 365 Work IQ REST API (delegated auth via MSAL device-code flow).",
+  "description": "Test harness for the Microsoft 365 Work IQ REST, MCP and A2A APIs (delegated auth via MSAL device-code flow).",
   "type": "module",
   "engines": {
     "node": ">=18"
@@ -12,6 +12,10 @@
     "web": "tsx demo-rest/server.ts",
     "web:rest": "tsx demo-rest/server.ts",
     "web:agent": "tsx demo-agent/server.ts",
+    "web:a2a": "tsx demo-a2a/server.ts",
+    "a2a": "tsx src/a2a-test.ts --chat",
+    "test:a2a": "tsx src/a2a-test.ts",
+    "a2a:min": "tsx src/a2a-minimal.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
