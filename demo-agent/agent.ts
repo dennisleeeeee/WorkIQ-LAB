@@ -117,6 +117,7 @@ export class WorkIqAgent {
 
   private async initTools(): Promise<void> {
     const { tools } = await this.mcp.listTools();
+    console.log(`[mcp] tools (${tools.length}): ${tools.map((t) => t.name).join(", ")}`);
     this.tools = tools.map((t) =>
       tool(
         async (args: Record<string, unknown>) => {
@@ -251,6 +252,9 @@ export class WorkIqAgent {
       const answered = new Set<string>();
 
       for (const call of calls) {
+        console.log(
+          `[tool] step=${step} → ${call.name} ${JSON.stringify(call.args).slice(0, 500)}`
+        );
         const selected = toolMap.get(call.name);
         let output: string;
         try {
@@ -260,6 +264,7 @@ export class WorkIqAgent {
         } catch (err) {
           output = `Tool error: ${(err as Error).message}`;
         }
+        console.log(`[tool] step=${step} ← ${call.name}: ${output.slice(0, 500)}`);
         this.history.push(
           new ToolMessage({ content: output, tool_call_id: call.id! })
         );
